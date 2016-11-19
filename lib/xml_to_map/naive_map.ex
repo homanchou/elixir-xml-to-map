@@ -1,5 +1,13 @@
 defmodule XmlToMap.NaiveMap do
 
+  @moduledoc """
+  Module to recursively traverse the output of erlsom.simple_form
+  and produce a map.
+
+  erlsom uses character lists so this library converts them to 
+  Elixir binary string.
+  """
+
   def parse([value]) do
     case is_tuple(value) do
       true -> parse(value)

@@ -7,7 +7,17 @@ defmodule XmlToMap.Mixfile do
      elixir: "~> 1.3",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: "A module for converting an XML string to a map",
+     package: package,
      deps: deps()]
+  end
+
+  def package do
+    [
+      maintainers: ["Homan Chou"],
+      licenses: ["MIT"],
+      links: %{"Github" => "https://github.com/homanchou/elixir-xml-to-map"}
+    ]
   end
 
   # Configuration for the OTP application
@@ -27,6 +37,9 @@ defmodule XmlToMap.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:erlsom, "~>1.4"}]
+    [
+      {:erlsom, "~>1.4"},
+      {:ex_doc, "~> 0.14", only: :dev}
+    ]
   end
 end

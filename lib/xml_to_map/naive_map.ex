@@ -17,14 +17,15 @@ defmodule XmlToMap.NaiveMap do
     end
   end
 
-  def parse([{name, _, _}, {name, _, _} | _] = list) do
-    %{to_string(name) => Enum.map(list, fn {_,_,c} -> parse(c) end)}
-  end
-
-  def parse([_first, _second | _] = list) do
-    Enum.reduce list, %{}, fn tuple, acc -> 
-      Map.merge(acc, parse(tuple)) 
-    end
+  def parse(list) when is_list(list) do
+    parsed_list = Enum.map list, &({to_string(elem(&1,0)), parse(&1)}) 
+    Enum.reduce parsed_list, %{}, fn {k,v}, acc -> 
+      case Map.get(acc, k) do
+        nil -> Map.put_new(acc, k, v[k])
+        [h|t] -> Map.put(acc, k, [h|t] ++ [v[k]])
+        prev -> Map.put(acc, k, [prev] ++ [v[k]])
+      end
+    end 
   end
 
   defp attr_map(list) do

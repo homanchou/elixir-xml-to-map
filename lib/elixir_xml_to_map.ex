@@ -20,7 +20,7 @@ defmodule XmlToMap do
 
   def naive_map(xml) do
     #can't handle xmlns
-    xml = String.replace(xml, ~r/\sxmlns=\"\S+\"/, "")
+    xml = String.replace(xml, ~r/(\sxmlns="\S+")|(xmlns:ns2="\S+")/, "")
     {:ok, tuples, _} = :erlsom.simple_form(xml)
     NaiveMap.parse(tuples)
   end

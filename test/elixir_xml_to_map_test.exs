@@ -3,11 +3,11 @@ defmodule XmlToMapTest do
   doctest XmlToMap
 
   test "make a map" do
-    assert XmlToMap.naive_map(sample_xml) == expectation
+    assert XmlToMap.naive_map(sample_xml()) == expectation()
   end
 
   test "combines sibling nodes with the same name into a list" do
-    assert XmlToMap.naive_map(amazon_xml) == amazon_expected
+    assert XmlToMap.naive_map(amazon_xml()) == amazon_expected()
   end
 
   def expectation do

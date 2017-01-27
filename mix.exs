@@ -8,7 +8,7 @@ defmodule XmlToMap.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      description: "A module for converting an XML string to a map",
-     package: package,
+     package: package(),
      deps: deps()]
   end
 

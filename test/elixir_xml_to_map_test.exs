@@ -3,18 +3,19 @@ defmodule XmlToMapTest do
   doctest XmlToMap
 
   test "make a map" do
-    assert XmlToMap.naive_map(sample_xml) == expectation
+    assert XmlToMap.naive_map(sample_xml()) == expectation()
   end
 
   test "combines sibling nodes with the same name into a list" do
-    assert XmlToMap.naive_map(amazon_xml) == amazon_expected
+    assert XmlToMap.naive_map(amazon_xml()) == amazon_expected()
   end
 
   def expectation do
     %{"Orders" => %{"foo" => "bar",
     "order" => [%{"billing_address" => "My address", "id" => "123",
        "items" => %{"item" => %{"description" => "Hat", "itemfoo" => "itembar",
-           "price" => "5.99", "quantity" => "1", "sku" => "ABC"},
+           "price" => "5.99", "quantity" => "1",
+           "sku" => %{"sku" => "ABC", "skufoo" => "skubar"}},
          "itemsfoo" => "itemsbar"}},
      %{"billing_address" => "Uncle's House", "id" => "124",
        "items" => %{"item" => %{"description" => "Hat", "price" => "5.99",

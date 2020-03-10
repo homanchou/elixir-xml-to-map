@@ -11,14 +11,31 @@ defmodule XmlToMapTest do
   end
 
   def expectation do
-    %{"Orders" => %{"foo" => "bar",
-    "order" => [%{"billing_address" => "My address", "id" => "123",
-       "items" => %{"item" => %{"description" => "Hat", "itemfoo" => "itembar",
-           "price" => "5.99", "quantity" => "1", "sku" => "ABC"},
-         "itemsfoo" => "itemsbar"}},
-     %{"billing_address" => "Uncle's House", "id" => "124",
-       "items" => %{"item" => %{"description" => "Hat", "price" => "5.99",
-           "quantity" => "2", "sku" => "ABC"}}}]}}
+    %{"Orders" =>
+      %{"foo" => "bar",
+        "order" => [%{"billing_address" => "My address", "id" => "123",
+                      "items" => %{"item" => [%{"description" => "Hat",
+                                               "item@itemfoo" => "itembar",
+                                               "itemfoo" => "itembar",
+                                               "price" => "5.99",
+                                               "quantity" => "1",
+                                               "sku" => "ABC",
+                                               "sku@skufoo" => "skubar"},
+                                              %{"description" => "Bat",
+                                                "item@itemfoo" => "itembaz",
+                                                "itemfoo" => "itembaz",
+                                                "price" => "9.99",
+                                                "quantity" => "2",
+                                                "sku" => "ABC"}],
+                                   "itemsfoo" => "itemsbar",
+                                   "items@itemsfoo" => "itemsbar"}},
+                    %{"billing_address" => "Uncle's House", "id" => "124",
+                      "items" => %{"item" => %{"description" => "Hat",
+                                               "price" => "5.99",
+                                               "quantity" => "2",
+                                               "sku" => "ABC"}}
+                    }],
+        "Orders@foo" => "bar"}}
   end
 
 
@@ -35,6 +52,14 @@ defmodule XmlToMapTest do
             <price>5.99</price>
             <quantity>
               1
+            </quantity>
+          </item>
+          <item itemfoo="itembaz">
+            <sku>ABC</sku>
+            <description>Bat</description>
+            <price>9.99</price>
+            <quantity>
+              2
             </quantity>
           </item>
         </items>

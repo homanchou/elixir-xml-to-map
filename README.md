@@ -27,6 +27,30 @@ XmlToMap.naive_map("<foo><point><x>1</x><y>5</y></point><point><x>2</x><y>9</y><
 # => %{"foo" => %{"point" => [%{"x" => "1", "y" => "5"}, %{"x" => "2", "y" => "9"}]}}
 ```
 
+This module is also inspired by Go xml to map package.
+
+Whenever we encounter a node with both attributes and children, we merge them both into a map but prepend "-" to any keys that came from node attributes and use the key "#content" to wrap the value of nodes child.
+
+For example this snippet:
+
+```xml
+<ItemDimensions>
+   <Height Units="inches">0.50</Height>
+</ItemDimensions>
+```
+
+Would become this snippet:
+
+```json
+...
+"ItemDimensions": {
+     "Height": {
+           "#content": "0.50",
+           "-Units": "inches"
+     }
+}
+```
+
 Depends on Erlsom to parse xml then converts the 'simple_form' structure into a map.
 
 I prefer Erlsom because it is the best documented erlang xml parser and because it mentions that it does not produce new atoms during the scanning.
@@ -42,7 +66,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:elixir_xml_to_map, "~> 0.1.3"}]
+      [{:elixir_xml_to_map, "~> 0.2"}]
     end
     ```
 

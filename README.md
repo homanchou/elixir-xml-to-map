@@ -14,13 +14,14 @@ Results in:
 %{"foo" => %{"bar" => "123"}}
 ```
 
-Converts xml string to an Elixir map with strings for keys.
+Converts xml string to an Elixir map with strings for keys, not atoms, since atoms are not garbage collected.
 
-This tool is inspired by Rails Hash.from_xml() but is "naive" in that it is convenient (requires no setup) but carries the same drawbacks. Use with caution.
+This tool is inspired by Rails Hash.from_xml()
 
-XML and Maps are non-isomorphic.  Attributes on some nodes don't carry over if the node has just one text value (like a leaf). Naive map has no validation over what should be a collection.  If and only if nodes are repeated at the same level will they beome a list.
+It's simple to use and doesn't require lengthy setup.  I call the function "naive", so use with caution because XML may have some structures which do not translate over to a map.   For example, naive map has no validation over what should be a collection.  If and only if nodes are repeated at the same level will they beome a list.
 
 ```elixir
+# there are two points inside foo, so the value of "point" becomes a list. Had "foo" only contained one point then there would be no list but instead one nested map
 XmlToMap.naive_map("<foo><point><x>1</x><y>5</y></point><point><x>2</x><y>9</y></point></foo>")
 
 # => %{"foo" => %{"point" => [%{"x" => "1", "y" => "5"}, %{"x" => "2", "y" => "9"}]}}

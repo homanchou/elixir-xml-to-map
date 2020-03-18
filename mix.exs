@@ -2,14 +2,16 @@ defmodule XmlToMap.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :elixir_xml_to_map,
-     version: "0.1.2",
-     elixir: "~> 1.3",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: "A module for converting an XML string to a map",
-     package: package(),
-     deps: deps()]
+    [
+      app: :elixir_xml_to_map,
+      version: "0.1.3",
+      elixir: "~> 1.3",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      description: "A module for converting an XML string to a map",
+      package: package(),
+      deps: deps()
+    ]
   end
 
   def package do

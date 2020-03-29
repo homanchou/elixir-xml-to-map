@@ -4,7 +4,7 @@ defmodule XmlToMap.Mixfile do
   def project do
     [
       app: :elixir_xml_to_map,
-      version: "0.2.0",
+      version: "1.0.0",
       elixir: "~> 1.9",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,

@@ -18,7 +18,11 @@ Converts xml string to an Elixir map with strings for keys, not atoms, since ato
 
 This tool is inspired by Rails Hash.from_xml()
 
-It's simple to use and doesn't require lengthy setup.  I call the function "naive", so use with caution because XML may have some structures which do not translate over to a map.   For example, naive map has no validation over what should be a collection.  If and only if nodes are repeated at the same level will they beome a list.
+----
+
+I call the function "naive", because there are known short comings and there is some [controversy] (https://stackoverflow.com/questions/40650482/how-to-convert-xml-to-a-map-in-elixir) around using a conversion tool like this since XML and Maps are non-isomorphic and there is no standard way to convert all the information from one format to another.  The recommended way to pull specific well structured information from XML is to use something like xpath.  But if you understand the risks and still prefer to convert the whole xml string to a map then this tool is for you!
+
+It is currently not able to parse xml namespace.  It also can't determine if a child should be a list unless it sees a repeated child.  If and only if nodes are repeated at the same level will they beome a list.
 
 ```elixir
 # there are two points inside foo, so the value of "point" becomes a list. Had "foo" only contained one point then there would be no list but instead one nested map
@@ -27,11 +31,12 @@ XmlToMap.naive_map("<foo><point><x>1</x><y>5</y></point><point><x>2</x><y>9</y><
 # => %{"foo" => %{"point" => [%{"x" => "1", "y" => "5"}, %{"x" => "2", "y" => "9"}]}}
 ```
 
-This module is also inspired by Go xml to map package.
+Previously this package did not handle xml node attributes.
+The current version takes inspiration from a [go goxml2json package] (https://github.com/basgys/goxml2json) and exports attributes in the map while prepending "-" so you know they are attributes.
 
-Whenever we encounter a node with both attributes and children, we merge them both into a map but prepend "-" to any keys that came from node attributes and use the key "#content" to wrap the value of nodes child.
+Whenever we encounter an xml node with BOTH attributes and children, we wrap "#content" around the node's inner value.
 
-For example this snippet:
+For example this snippet has a `Height` leaf node with attribute `Units` and a value of `0.50`:
 
 ```xml
 <ItemDimensions>
@@ -39,7 +44,7 @@ For example this snippet:
 </ItemDimensions>
 ```
 
-Would become this snippet:
+This would become this snippet:
 
 ```json
 ...
@@ -51,12 +56,15 @@ Would become this snippet:
 }
 ```
 
-Depends on Erlsom to parse xml then converts the 'simple_form' structure into a map.
+-----
+
+There is a dependency on Erlsom to parse xml then converts the 'simple_form' structure into a map.
 
 I prefer Erlsom because it is the best documented erlang xml parser and because it mentions that it does not produce new atoms during the scanning.
 
-See tests for example usage.
+See tests for some example usage.
 
+----
 
 ## Installation
 
@@ -66,7 +74,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:elixir_xml_to_map, "~> 0.2"}]
+      [{:elixir_xml_to_map, "~> 1.0"}]
     end
     ```
 

@@ -10,7 +10,7 @@ defmodule XmlToMap do
   but is "naive" in that it is convenient (requires no setup)
   but carries the same drawbacks.  For example no validation over
   what should be a collection.  If and only if nodes are repeated
-  at the same level will they beome a list.  If a node has attributes
+  at the same level will they become a list.  If a node has attributes
   we'll prepend a "-" in front of them and merge them into the map and
   take the node value and nest that inside "#content" key.
   """

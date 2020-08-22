@@ -10,6 +10,29 @@ defmodule XmlToMapTest do
     assert XmlToMap.naive_map(amazon_xml()) == amazon_expected()
   end
 
+  test "empty tag => nil" do
+    xml = """
+      <xml>
+        <id>1</id>
+        <name>Value</name>
+        <empty></empty>
+        <emptyWithAttrs id="123" />
+      </xml>
+    """
+
+    assert XmlToMap.naive_map(xml) == %{
+      "xml" => %{
+        "id" => "1",
+        "name" => "Value",
+        "empty" => nil,
+        "emptyWithAttrs" => %{
+          "#content" => nil,
+          "-id" => "123"
+        }
+      }
+    }
+  end
+
   def expectation do
     %{
       "orders" => %{

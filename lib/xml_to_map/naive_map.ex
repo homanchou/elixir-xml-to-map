@@ -47,18 +47,24 @@ defmodule XmlToMap.NaiveMap do
   def parse(list) when is_list(list) do
     parsed_list = Enum.map(list, &{to_string(elem(&1, 0)), parse(&1)})
 
-    Enum.reduce(parsed_list, %{}, fn {k, v}, acc ->
-      case Map.get(acc, k) do
-        nil ->
-          for({key, value} <- v, into: %{}, do: {key, value})
-          |> Map.merge(acc)
+    content =
+      Enum.reduce(parsed_list, %{}, fn {k, v}, acc ->
+        case Map.get(acc, k) do
+          nil ->
+            for({key, value} <- v, into: %{}, do: {key, value})
+            |> Map.merge(acc)
 
-        [h | t] ->
-          Map.put(acc, k, [h | t] ++ [v[k]])
+          [h | t] ->
+            Map.put(acc, k, [h | t] ++ [v[k]])
 
-        prev ->
-          Map.put(acc, k, [prev] ++ [v[k]])
-      end
-    end)
+          prev ->
+            Map.put(acc, k, [prev] ++ [v[k]])
+        end
+      end)
+
+    case content == %{} do
+      true -> nil
+      _ -> content
+    end
   end
 end

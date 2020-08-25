@@ -56,6 +56,8 @@ This would become this snippet:
 }
 ```
 
+Empty tags will have a value of nil.
+
 -----
 
 There is a dependency on Erlsom to parse xml then converts the 'simple_form' structure into a map.
@@ -74,7 +76,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
     ```elixir
     def deps do
-      [{:elixir_xml_to_map, "~> 1.0"}]
+      [{:elixir_xml_to_map, "~> 2.0"}]
     end
     ```
 

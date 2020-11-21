@@ -74,16 +74,16 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
   1. Add `elixir_xml_to_map` to your list of dependencies in `mix.exs`:
 
-    ```elixir
-    def deps do
-      [{:elixir_xml_to_map, "~> 2.0"}]
-    end
-    ```
+```elixir
+def deps do
+  [{:elixir_xml_to_map, "~> 2.0"}]
+end
+```
 
   2. Ensure `elixir_xml_to_map` is started before your application:
 
-    ```elixir
-    def application do
-      [applications: [:elixir_xml_to_map]]
-    end
-    ```
+```elixir
+def application do
+  [applications: [:elixir_xml_to_map]]
+end
+```

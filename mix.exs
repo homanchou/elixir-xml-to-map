@@ -1,6 +1,8 @@
 defmodule XmlToMap.Mixfile do
   use Mix.Project
 
+  @source_url "https://github.com/homanchou/elixir-xml-to-map"
+
   def project do
     [
       app: :elixir_xml_to_map,
@@ -10,38 +12,35 @@ defmodule XmlToMap.Mixfile do
       start_permanent: Mix.env() == :prod,
       description: "A module for converting an XML string to a map",
       package: package(),
-      deps: deps()
+      deps: deps(),
+      docs: docs()
     ]
   end
 
   def package do
     [
       maintainers: ["Homan Chou"],
-      licenses: ["MIT"],
-      links: %{"Github" => "https://github.com/homanchou/elixir-xml-to-map"}
+      licenses: ["Apache-2.0"],
+      links: %{"GitHub" => @source_url}
     ]
   end
 
-  # Configuration for the OTP application
-  #
-  # Type "mix help compile.app" for more information
   def application do
     [extra_applications: [:logger]]
   end
 
-  # Dependencies can be Hex packages:
-  #
-  #   {:mydep, "~> 0.3.0"}
-  #
-  # Or git/path repositories:
-  #
-  #   {:mydep, git: "https://github.com/elixir-lang/mydep.git", tag: "0.1.0"}
-  #
-  # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:erlsom, "~>1.4"},
-      {:ex_doc, "~>0.21.3", only: :dev, runtime: false}
+      {:erlsom, "~> 1.4"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
+    ]
+  end
+
+  defp docs do
+    [
+      main: "readme",
+      source_url: @source_url,
+      extras: ["README.md"]
     ]
   end
 end

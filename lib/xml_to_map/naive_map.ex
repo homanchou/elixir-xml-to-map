@@ -1,12 +1,12 @@
 defmodule XmlToMap.NaiveMap do
   @moduledoc """
-  Module to recursively traverse the output of erlsom.simple_form
+  Module to recursively traverse the output of `erlsom.simple_form/1`
   and produce a map.
 
-  erlsom uses character lists so this library converts them to
+  `erlsom` uses character lists so this library converts them to
   Elixir binary string.
 
-  Attributes, if present, are defined as tag@attribute_name => attribute_value
+  Attributes, if present, are defined as `tag@attribute_name => attribute_value`.
   """
 
   # if a single list element of a tuple, ignore the list detail and parse it

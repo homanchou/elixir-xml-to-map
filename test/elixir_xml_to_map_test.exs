@@ -21,16 +21,16 @@ defmodule XmlToMapTest do
     """
 
     assert XmlToMap.naive_map(xml) == %{
-      "xml" => %{
-        "id" => "1",
-        "name" => "Value",
-        "empty" => nil,
-        "emptyWithAttrs" => %{
-          "#content" => nil,
-          "-id" => "123"
-        }
-      }
-    }
+             "xml" => %{
+               "id" => "1",
+               "name" => "Value",
+               "empty" => nil,
+               "emptyWithAttrs" => %{
+                 "#content" => nil,
+                 "-id" => "123"
+               }
+             }
+           }
   end
 
   def expectation do

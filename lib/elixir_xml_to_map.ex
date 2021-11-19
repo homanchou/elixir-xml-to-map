@@ -16,10 +16,6 @@ defmodule XmlToMap do
   and take the node value and nest that inside "#content" key.
   """
   def naive_map(xml, namespace_match_fn \\ nil) do
-    # can't handle xmlns, if left in will prepend every output map
-    # key with the xmlns value in curly braces
-    # xml = String.replace(xml, ~r/(\sxmlns="\S+")|(xmlns:ns2="\S+")/, "")
-
     tree = get_generic_data_structure(xml, namespace_match_fn)
     NaiveMap.parse(tree)
   end

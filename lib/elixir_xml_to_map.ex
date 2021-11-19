@@ -15,12 +15,12 @@ defmodule XmlToMap do
   attributes we'll prepend a "-" in front of them and merge them into the map
   and take the node value and nest that inside "#content" key.
   """
-  def naive_map(xml) do
+  def naive_map(xml, namespace_match_fn \\ nil) do
     # can't handle xmlns, if left in will prepend every output map
     # key with the xmlns value in curly braces
-    xml = String.replace(xml, ~r/(\sxmlns="\S+")|(xmlns:ns2="\S+")/, "")
+    # xml = String.replace(xml, ~r/(\sxmlns="\S+")|(xmlns:ns2="\S+")/, "")
 
-    tree = get_generic_data_structure(xml)
+    tree = get_generic_data_structure(xml, namespace_match_fn)
     NaiveMap.parse(tree)
   end
 
@@ -30,8 +30,13 @@ defmodule XmlToMap do
   # Tag is a string
   # Attributes = [{AttributeName, Value}],
   # Content is a list of Elements and/or strings.
-  defp get_generic_data_structure(xml) do
+  defp get_generic_data_structure(xml, nil) do
     {:ok, element, _tail} = :erlsom.simple_form(xml)
+    element
+  end
+
+  defp get_generic_data_structure(xml, namespace_match_fn) do
+    {:ok, element, _tail} = :erlsom.simple_form(xml, [{:nameFun, namespace_match_fn}])
     element
   end
 end

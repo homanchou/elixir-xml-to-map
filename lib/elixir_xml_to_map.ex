@@ -15,8 +15,11 @@ defmodule XmlToMap do
   attributes we'll prepend a "-" in front of them and merge them into the map
   and take the node value and nest that inside "#content" key.
   """
-  def naive_map(xml, opts \\ %{}) do
-    tree = get_generic_data_structure(xml, opts)
+  @defaults %{namespace_match_fn: &__MODULE__.default_namespace_match_fn/0}
+
+  def naive_map(xml, opts \\ []) do
+    params = Enum.into(opts, @defaults)
+    tree = get_generic_data_structure(xml, params)
     NaiveMap.parse(tree)
   end
 
@@ -39,8 +42,8 @@ defmodule XmlToMap do
     end
   end
 
-  defp get_generic_data_structure(xml, %{namespace_match_fn: namespace_match_fn} = opts) do
-    {:ok, element, _tail} = :erlsom.simple_form(xml, [{:nameFun, namespace_match_fn}])
+  defp get_generic_data_structure(xml, %{namespace_match_fn: namespace_match_fn}) do
+    {:ok, element, _tail} = :erlsom.simple_form(xml, [{:nameFun, namespace_match_fn.()}])
     element
   end
 

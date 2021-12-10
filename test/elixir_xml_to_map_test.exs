@@ -7,8 +7,7 @@ defmodule XmlToMapTest do
   end
 
   test "combines sibling nodes with the same name into a list" do
-    rm_namespace_and_prefix_fn = fn(name, namespace, prefix) -> name end
-    assert XmlToMap.naive_map(amazon_xml(), %{namespace_match_fn: rm_namespace_and_prefix_fn}) == amazon_expected()
+    assert XmlToMap.naive_map(amazon_xml()) == amazon_expected()
   end
 
   test "empty tag => nil" do
@@ -35,7 +34,7 @@ defmodule XmlToMapTest do
   end
 
   test "support for xmlns xml file" do
-    assert XmlToMap.naive_map(facebook_xmlns_xml, %{namespace_match_fn: XmlToMap.default_namespace_match_fn }) == facebook_xmlns_xml_expected
+    assert XmlToMap.naive_map(facebook_xmlns_xml(), [namespace_match_fn: &XmlToMap.default_namespace_match_fn/0]) == facebook_xmlns_xml_expected()
   end
 
   def expectation do

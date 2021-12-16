@@ -33,6 +33,10 @@ defmodule XmlToMapTest do
            }
   end
 
+  test "support for custom namespace_match function" do
+    assert XmlToMap.naive_map(facebook_xmlns_xml(), [namespace_match_fn: &set_prefix_namespace_fn/0]) == facebook_custom_function_expected()
+  end
+
   test "support for xmlns xml file" do
     assert XmlToMap.naive_map(facebook_xmlns_xml(), [namespace_match_fn: &XmlToMap.default_namespace_match_fn/0]) == facebook_xmlns_xml_expected()
   end
@@ -259,6 +263,48 @@ defmodule XmlToMapTest do
           ]
         },
         "ResponseMetadata" => %{"RequestId" => "7509cdb2-0b69-4ca0-89dc-c77f8a747834"}
+      }
+    }
+  end
+
+  def set_prefix_namespace_fn do
+    fn(name, namespace, prefix) ->
+      cond do
+        namespace != [] && prefix != [] -> "#{prefix}_namespace:#{name}"
+        true -> name
+      end
+    end
+  end
+
+  def facebook_custom_function_expected do
+    %{
+      "rss" => %{
+        "#content" => %{
+          "channel" => %{
+            "title" => "Test Store",
+            "link" => "http://www.example.com",
+            "description" => "An example item from the feed",
+            "item" => %{
+              "g_namespace:id" => "DB_1",
+              "g_namespace:title" => "Dog Bowl In Blue",
+              "g_namespace:description" => "Solid plastic Dog Bowl in marine blue color",
+              "g_namespace:link" => "http://www.example.com/bowls/db-1.html",
+              "g_namespace:image_link" => "http://images.example.com/DB_1.png",
+              "g_namespace:brand" => "Example",
+              "g_namespace:condition" => "new",
+              "g_namespace:availability" => "in stock",
+              "g_namespace:price" => "9.99 GBP",
+              "g_namespace:shipping" => %{
+                "g_namespace:country" => "UK",
+                "g_namespace:service" => "Standard",
+                "g_namespace:price" => "4.95 GBP",
+              },
+              "g_namespace:google_product_category" => "Animals > Pet Supplies",
+              "g_namespace:custom_label_0" => "Made in Waterford, IE",
+            }
+          }
+        },
+        "-version" => "2.0"
       }
     }
   end

@@ -38,7 +38,7 @@ defmodule XmlToMapTest do
   end
 
   test "support for xmlns xml file" do
-    assert XmlToMap.naive_map(facebook_xmlns_xml(), [namespace_match_fn: &XmlToMap.default_namespace_match_fn/0]) == facebook_xmlns_xml_expected()
+    assert XmlToMap.naive_map(facebook_xmlns_xml()) == facebook_xmlns_xml_expected()
   end
 
   def expectation do

@@ -90,7 +90,7 @@ The package can be installed as:
 
     ```elixir
     def application do
-      [applications: [:elixir_xml_to_map]]
+      [extra_applications: [:elixir_xml_to_map]]
     end
     ```
 

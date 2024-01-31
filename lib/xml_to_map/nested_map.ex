@@ -7,6 +7,13 @@ defmodule XmlToMap.NestedMap do
   Elixir binary string.
   """
 
+  @typedoc "Type of a nested map"
+  @type element :: %{
+          name: String.t(),
+          attributes: map() | [{charlist() | String.t(), charlist() | String.t()}],
+          content: [element()]
+        }
+
   # if a single list element of a tuple, ignore the list detail and parse it
   def parse([{tag, attributes, content}]) do
     parse({tag, attributes, content})

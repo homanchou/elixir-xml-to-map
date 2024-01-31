@@ -20,6 +20,13 @@ defmodule XmlToMap.NestedMap do
   # a parse with a tuples is probably the entry point we'll hit first
   # if this node has no attributes, our work is easier
   def parse({tag, attributes, content}) do
+    attributes =
+      for {k, v} <- attributes do
+        k = if is_list(k) and List.ascii_printable?(k), do: to_string(k), else: k
+        v = if is_list(v) and List.ascii_printable?(v), do: to_string(v), else: v
+        {k, v}
+      end
+
     %{name: to_string(tag), attributes: attributes, content: parse(content)}
   end
 

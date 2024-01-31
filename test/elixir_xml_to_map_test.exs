@@ -46,7 +46,7 @@ defmodule XmlToMapTest do
                %{attributes: [], name: "id", content: "1"},
                %{attributes: [], name: "name", content: "Value"},
                %{attributes: [], name: "empty", content: nil},
-               %{attributes: [{~c"id", ~c"123"}], name: "emptyWithAttrs", content: nil}
+               %{attributes: [{"id", "123"}], name: "emptyWithAttrs", content: nil}
              ],
              name: "xml"
            }
@@ -128,17 +128,17 @@ defmodule XmlToMapTest do
               name: "items",
               content: [
                 %{
-                  attributes: [{~c"currency", ~c"USD"}],
+                  attributes: [{"currency", "USD"}],
                   name: "item",
                   content: [
-                    %{attributes: [{~c"lang", ~c"en"}], name: "sku", content: "ABC"},
+                    %{attributes: [{"lang", "en"}], name: "sku", content: "ABC"},
                     %{attributes: [], name: "description", content: "Hat"},
                     %{attributes: [], name: "price", content: "5.99"},
                     %{attributes: [], name: "quantity", content: "1"}
                   ]
                 },
                 %{
-                  attributes: [{~c"currency", ~c"USD"}],
+                  attributes: [{"currency", "USD"}],
                   name: "item",
                   content: [
                     %{attributes: [], name: "sku", content: "ABC"},
@@ -161,7 +161,7 @@ defmodule XmlToMapTest do
               attributes: [],
               name: "items",
               content: %{
-                attributes: [{~c"currency", ~c"USD"}],
+                attributes: [{"currency", "USD"}],
                 name: "item",
                 content: [
                   %{attributes: [], name: "sku", content: "ABC"},

@@ -25,8 +25,9 @@ defmodule XmlToMap do
 
   def nested_map(xml, opts \\ []) do
     params = Enum.into(opts, @defaults)
+    {purge_empty, params} = Map.pop(params, :purge_empty, false)
     tree = get_generic_data_structure(xml, params)
-    NestedMap.parse(tree)
+    NestedMap.parse(tree, purge_empty)
   end
 
   # Default function to handle namespace in xml

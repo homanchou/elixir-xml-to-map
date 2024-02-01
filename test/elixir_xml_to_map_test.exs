@@ -50,6 +50,16 @@ defmodule XmlToMapTest do
              ],
              name: "xml"
            }
+
+    assert XmlToMap.nested_map(xml, purge_empty: true) == %{
+             content: [
+               %{name: "id", content: "1"},
+               %{name: "name", content: "Value"},
+               %{name: "empty"},
+               %{attributes: [{"id", "123"}], name: "emptyWithAttrs"}
+             ],
+             name: "xml"
+           }
   end
 
   test "support for custom namespace_match function" do

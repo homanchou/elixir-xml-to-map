@@ -2,12 +2,20 @@ defmodule XmlToMapTest do
   use ExUnit.Case
   doctest XmlToMap
 
-  test "make a map" do
-    assert XmlToMap.naive_map(sample_xml()) == expectation()
+  test "make a map (naive)" do
+    assert XmlToMap.naive_map(sample_xml()) == expectation_naive()
   end
 
-  test "combines sibling nodes with the same name into a list" do
-    assert XmlToMap.naive_map(amazon_xml()) == amazon_expected()
+  test "combines sibling nodes with the same name into a list (naive)" do
+    assert XmlToMap.naive_map(amazon_xml()) == amazon_expected_naive()
+  end
+
+  test "make a map (nested)" do
+    assert XmlToMap.nested_map(sample_xml()) == expectation_nested()
+  end
+
+  test "combines sibling nodes with the same name into a list (nested)" do
+    assert XmlToMap.nested_map(amazon_xml()) == amazon_expected_nested()
   end
 
   test "empty tag => nil" do
@@ -31,17 +39,40 @@ defmodule XmlToMapTest do
                }
              }
            }
+
+    assert XmlToMap.nested_map(xml) == %{
+             attributes: [],
+             content: [
+               %{attributes: [], name: "id", content: "1"},
+               %{attributes: [], name: "name", content: "Value"},
+               %{attributes: [], name: "empty", content: nil},
+               %{attributes: [{"id", "123"}], name: "emptyWithAttrs", content: nil}
+             ],
+             name: "xml"
+           }
+
+    assert XmlToMap.nested_map(xml, purge_empty: true) == %{
+             content: [
+               %{name: "id", content: "1"},
+               %{name: "name", content: "Value"},
+               %{name: "empty"},
+               %{attributes: [{"id", "123"}], name: "emptyWithAttrs"}
+             ],
+             name: "xml"
+           }
   end
 
   test "support for custom namespace_match function" do
-    assert XmlToMap.naive_map(facebook_xmlns_xml(), [namespace_match_fn: &set_prefix_namespace_fn/0]) == facebook_custom_function_expected()
+    assert XmlToMap.naive_map(facebook_xmlns_xml(),
+             namespace_match_fn: &set_prefix_namespace_fn/0
+           ) == facebook_custom_function_expected()
   end
 
   test "support for xmlns xml file" do
     assert XmlToMap.naive_map(facebook_xmlns_xml()) == facebook_xmlns_xml_expected()
   end
 
-  def expectation do
+  def expectation_naive do
     %{
       "orders" => %{
         "order" => [
@@ -91,6 +122,71 @@ defmodule XmlToMapTest do
     }
   end
 
+  def expectation_nested do
+    %{
+      name: "orders",
+      attributes: [],
+      content: [
+        %{
+          name: "order",
+          attributes: [],
+          content: [
+            %{attributes: [], name: "id", content: "123"},
+            %{attributes: [], name: "billing_address", content: "My address"},
+            %{
+              attributes: [],
+              name: "items",
+              content: [
+                %{
+                  attributes: [{"currency", "USD"}],
+                  name: "item",
+                  content: [
+                    %{attributes: [{"lang", "en"}], name: "sku", content: "ABC"},
+                    %{attributes: [], name: "description", content: "Hat"},
+                    %{attributes: [], name: "price", content: "5.99"},
+                    %{attributes: [], name: "quantity", content: "1"}
+                  ]
+                },
+                %{
+                  attributes: [{"currency", "USD"}],
+                  name: "item",
+                  content: [
+                    %{attributes: [], name: "sku", content: "ABC"},
+                    %{attributes: [], name: "description", content: "Bat"},
+                    %{attributes: [], name: "price", content: "9.99"},
+                    %{attributes: [], name: "quantity", content: "2"}
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        %{
+          attributes: [],
+          name: "order",
+          content: [
+            %{attributes: [], name: "id", content: "124"},
+            %{attributes: [], name: "billing_address", content: "Uncle's House"},
+            %{
+              attributes: [],
+              name: "items",
+              content: %{
+                attributes: [{"currency", "USD"}],
+                name: "item",
+                content: [
+                  %{attributes: [], name: "sku", content: "ABC"},
+                  %{attributes: [], name: "description", content: "Hat"},
+                  %{attributes: [], name: "price", content: "5.99"},
+                  %{attributes: [], name: "quantity", content: "2"}
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  end
+
   def sample_xml do
     """
       <orders>
@@ -132,7 +228,7 @@ defmodule XmlToMapTest do
     """
   end
 
-  def amazon_expected do
+  def amazon_expected_naive do
     %{
       "GetReportRequestListResponse" => %{
         "GetReportRequestListResult" => %{
@@ -267,8 +363,279 @@ defmodule XmlToMapTest do
     }
   end
 
+  def amazon_expected_nested do
+    %{
+      attributes: [],
+      content: [
+        %{
+          attributes: [],
+          name: "GetReportRequestListResult",
+          content: [
+            %{attributes: [], name: "HasNext", content: "true"},
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T20:53:00+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50920017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T20:53:07+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T20:53:00+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T20:53:00+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T20:53:14+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3412841972017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_AFN_INVENTORY_DATA_BY_COUNTRY_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T20:51:44+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50919017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T20:51:49+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T20:51:44+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T20:51:44+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T20:51:57+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3414908503017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T14:54:10+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50918017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T14:54:17+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T14:54:10+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T14:54:10+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T14:54:24+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3410642176017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_AFN_INVENTORY_DATA_BY_COUNTRY_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T14:52:26+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50917017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T14:52:32+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T14:52:26+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T14:52:26+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T14:52:37+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3417419172017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T08:53:49+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50916017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T08:53:54+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T08:53:49+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T08:53:49+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T08:54:01+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3408643280017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_AFN_INVENTORY_DATA_BY_COUNTRY_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T08:51:43+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50915017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T08:51:49+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T08:51:43+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T08:51:43+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T08:51:55+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3410105984017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T02:57:34+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50914017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T02:57:39+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T02:57:34+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T02:57:34+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T02:57:46+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3408556063017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_AFN_INVENTORY_DATA_BY_COUNTRY_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-18T02:55:59+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50913017123"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-18T02:56:05+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-18T02:55:59+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-18T02:55:59+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-18T02:56:12+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3402759511017123"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_FBA_MYI_UNSUPPRESSED_INVENTORY_DATA_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-17T20:55:49+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50912017122"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-17T20:55:54+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-17T20:55:49+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-17T20:55:49+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-17T20:56:04+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3399094295017122"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "ReportRequestInfo",
+              content: [
+                %{
+                  attributes: [],
+                  name: "ReportType",
+                  content: "_GET_AFN_INVENTORY_DATA_BY_COUNTRY_"
+                },
+                %{attributes: [], name: "ReportProcessingStatus", content: "_DONE_"},
+                %{attributes: [], name: "EndDate", content: "2016-11-17T20:54:33+00:00"},
+                %{attributes: [], name: "Scheduled", content: "false"},
+                %{attributes: [], name: "ReportRequestId", content: "50911017122"},
+                %{
+                  attributes: [],
+                  name: "StartedProcessingDate",
+                  content: "2016-11-17T20:54:39+00:00"
+                },
+                %{attributes: [], name: "SubmittedDate", content: "2016-11-17T20:54:33+00:00"},
+                %{attributes: [], name: "StartDate", content: "2016-11-17T20:54:33+00:00"},
+                %{attributes: [], name: "CompletedDate", content: "2016-11-17T20:54:45+00:00"},
+                %{attributes: [], name: "GeneratedReportId", content: "3405850523017122"}
+              ]
+            },
+            %{
+              attributes: [],
+              name: "NextToken",
+              content:
+                "bnKUjUwrpfD2jpZedg0wbVuY6vtoszFEs90MCUIyGQ/PkNXwVrATLSf6YzH8PQiWICyhlLgHd4gqVtOYt5i3YX/y5ZICxITwrMWltwHPross7S2LHmNKmcpVErfopfm7ZgI5YM+bbLFRPCnQrq7eGPqiUs2SoKaRPxuuVZAjoAG5Hd34Twm1igafEPREmauvQPEfQK/OReJ9wNJ/XIY3rAvjRfjTJJa5YKoSylcR8gttj983g7esDr0wZ3V0GwaZstMPcqxOnL//uIo+owquzirF36SWlaJ9J5zSS6le1iIsxqkIMXCWKNSOyeZZ1ics+UXSqjS0c15jmJnjJN2V5uMEDoXRsC9PFEVVZ6joTY2uGFVSjAf2NsFIcEAdr4xQz2Y051TPxxk="
+            }
+          ]
+        },
+        %{
+          attributes: [],
+          name: "ResponseMetadata",
+          content: %{
+            attributes: [],
+            name: "RequestId",
+            content: "7509cdb2-0b69-4ca0-89dc-c77f8a747834"
+          }
+        }
+      ],
+      name: "GetReportRequestListResponse"
+    }
+  end
+
   def set_prefix_namespace_fn do
-    fn(name, namespace, prefix) ->
+    fn name, namespace, prefix ->
       cond do
         namespace != [] && prefix != [] -> "#{prefix}_namespace:#{name}"
         true -> name
@@ -297,10 +664,10 @@ defmodule XmlToMapTest do
               "g_namespace:shipping" => %{
                 "g_namespace:country" => "UK",
                 "g_namespace:service" => "Standard",
-                "g_namespace:price" => "4.95 GBP",
+                "g_namespace:price" => "4.95 GBP"
               },
               "g_namespace:google_product_category" => "Animals > Pet Supplies",
-              "g_namespace:custom_label_0" => "Made in Waterford, IE",
+              "g_namespace:custom_label_0" => "Made in Waterford, IE"
             }
           }
         },
@@ -330,10 +697,10 @@ defmodule XmlToMapTest do
               "g:shipping" => %{
                 "g:country" => "UK",
                 "g:service" => "Standard",
-                "g:price" => "4.95 GBP",
+                "g:price" => "4.95 GBP"
               },
               "g:google_product_category" => "Animals > Pet Supplies",
-              "g:custom_label_0" => "Made in Waterford, IE",
+              "g:custom_label_0" => "Made in Waterford, IE"
             }
           }
         },

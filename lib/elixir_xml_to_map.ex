@@ -3,7 +3,7 @@ defmodule XmlToMap do
   Simple convenience module for getting a map out of an XML string.
   """
 
-  alias XmlToMap.NaiveMap
+  alias XmlToMap.{NaiveMap, NestedMap}
 
   @doc """
   `naive_map/1` utility is inspired by `Rails Hash.from_xml()` but is
@@ -23,6 +23,13 @@ defmodule XmlToMap do
     NaiveMap.parse(tree)
   end
 
+  def nested_map(xml, opts \\ []) do
+    params = Enum.into(opts, @defaults)
+    {purge_empty, params} = Map.pop(params, :purge_empty, false)
+    tree = get_generic_data_structure(xml, params)
+    NestedMap.parse(tree, purge_empty)
+  end
+
   # Default function to handle namespace in xml
   # This fuction invokes an anonymous function that has this parameters: Name, Namespace, Prefix.
   # Usually, the namespace appears at the top of xml file, e.g `xmlns:g="http://base.google.com/ns/1.0"`,
@@ -34,7 +41,7 @@ defmodule XmlToMap do
   # otherwise it will return only the name.
   # The default behavior in :erlsom.simple_form/2 is Name if Namespace == undefined, and a string {Namespace}Name otherwise.
   def default_namespace_match_fn do
-    fn(name, namespace, prefix) ->
+    fn name, namespace, prefix ->
       cond do
         namespace != [] && prefix != [] -> "#{prefix}:#{name}"
         true -> name

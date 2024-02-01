@@ -6,7 +6,9 @@
 [![License](https://img.shields.io/hexpm/l/elixir_xml_to_map.svg)](https://github.com/homanchou/elixir_xml_to_map/blob/master/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/homanchou/elixir-xml-to-map.svg)](https://github.com/homanchou/elixir-xml-to-map/commits/master)
 
-Creates an Elixir Map data structure from an XML string.
+This library provides two functions to create an Elixir Map data structure from an XML string.
+
+### `XmlToMap.naive_map/2`
 
 Usage:
 
@@ -63,6 +65,67 @@ This would become this snippet:
 ```
 
 Empty tags will have a value of nil.
+
+### `XmlToMap.nested_map/2`
+
+This function produces arguably more verbose and less straightforward result, but it preserves
+the order of sequences and might be then instantiated back to _XML_ in an isomorphic way. 
+
+In general, it reflects the tree structure of an input _XML_ per se.
+
+Usage:
+
+```elixir
+XmlToMap.nested_map("<foo><bar>123</bar></foo>")
+```
+
+Results in:
+
+```elixir
+%{
+  attributes: [],
+  name: "foo",
+  content: %{attributes: [], name: "bar", content: "123"}
+}
+```
+
+The function does not make any assumptions about the content and recursively builds the result.
+
+```xml
+<ItemDimensions>
+   <Height Units="inches">0.50</Height>
+</ItemDimensions>
+```
+
+This would become this snippet:
+
+```elixir
+%{
+  attributes: [],
+  name: "ItemDimensions",
+  content: %{attributes: [{"Units", "inches"}], name: "Height", content: "0.50"}
+}
+```
+
+Which might then be converted to _JSON_ of the same shape.
+
+To make it less verbose, pass `purge_empty: true` as the second parameter to `XmlToMap.nested_map/2`:
+
+```elixir
+XmlToMap.nested_map("<foo><bar arg='yes'>123</bar><baz/></foo>", purge_empty: true)
+```
+
+Results in:
+
+```elixir
+%{
+  name: "foo",
+  content: [
+    %{attributes: [{"arg", "yes"}], name: "bar", content: "123"},
+    %{name: "baz"}
+  ]
+}
+```
 
 -----
 
